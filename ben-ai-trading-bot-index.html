@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#071a2b">
+<title>BEN AI Trading Bot — Paper Trading</title>
+<style>
+:root{--bg:#071a2b;--panel:#10283d;--panel2:#0b2236;--line:#24445d;--text:#eaf3fa;--muted:#9bb1c2;--green:#39d98a;--red:#ff6b75;--blue:#64b5f6;--gold:#f6c85f}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#071a2b,#0b263b 60%,#071a2b);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:1120px;margin:auto;padding:22px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.brand{display:flex;gap:12px;align-items:center}.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#1e9e76,#1769aa);display:grid;place-items:center;font-weight:900;font-size:18px}
+h1{font-size:22px;margin:0}small,.muted{color:var(--muted)}.tag{border:1px solid #28624d;color:var(--green);border-radius:999px;padding:6px 11px;font-size:12px;font-weight:700}
+.notice{border:1px solid #755f2d;background:#332b18;color:#ffe5a3;padding:12px 14px;border-radius:12px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.card{background:rgba(16,40,61,.94);border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0}.label{font-size:12px;color:var(--muted);margin-bottom:6px}.value{font-size:22px;font-weight:750;overflow-wrap:anywhere}.up{color:var(--green)}.down{color:var(--red)}
+.layout{display:grid;grid-template-columns:1.25fr .75fr;gap:14px;margin-top:14px}.section-title{font-size:16px;font-weight:750;margin:0 0 12px}.coin{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);gap:10px}.coin:last-child{border:0}.coin strong{font-size:15px}.pill{font-size:11px;padding:4px 8px;border-radius:999px;background:#183d54;color:#b9dcf2}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}input,select{width:100%;background:#071c2d;border:1px solid var(--line);color:var(--text);border-radius:9px;padding:10px;font:inherit}
+button{border:0;border-radius:10px;padding:11px 14px;font-weight:750;cursor:pointer;background:#16865f;color:white}button.secondary{background:#21445f;color:var(--text)}button.danger{background:#8d3340}button:disabled{opacity:.5;cursor:not-allowed}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:10px 7px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:600}.scroll{overflow-x:auto}
+.status{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:6px}.log{max-height:220px;overflow:auto;font-size:12px;color:var(--muted)}.log div{padding:7px 0;border-bottom:1px solid var(--line)}
+footer{color:var(--muted);font-size:12px;margin:20px 0 8px}.wide{margin-top:14px}
+@media(max-width:800px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.layout{grid-template-columns:1fr}.wrap{padding:14px}.value{font-size:19px}}
+@media(max-width:420px){.controls{grid-template-columns:1fr}.top{align-items:flex-start}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><div class="logo">BEN</div><div><h1>BEN AI TRADING BOT</h1><small>BTC / ETH · Paper trading · Simulasi saja</small></div></div>
+    <span class="tag"><span class="status"></span>MODE SIMULASI AKTIF</span>
+  </header>
+  <div class="notice"><b>Perhatian:</b> Website ini hanya membaca data pasar publik dan mencatat transaksi simulasi di browser. Tidak terhubung ke akun Ajaib, tidak mengirim order sungguhan, dan tidak menjamin keuntungan. Jangan masukkan password atau API key Ajaib di sini.</div>
+
+  <section class="grid">
+    <div class="card"><div class="label">Modal simulasi</div><div class="value" id="equity">Rp100.000</div><small id="cash">Kas tersedia: Rp100.000</small></div>
+    <div class="card"><div class="label">Nilai portofolio</div><div class="value" id="portfolio">Rp100.000</div><small id="pnl">P/L: Rp0 (0,00%)</small></div>
+    <div class="card"><div class="label">Transaksi selesai</div><div class="value" id="trades">0</div><small id="winrate">Win rate: —</small></div>
+    <div class="card"><div class="label">Status strategi</div><div class="value" id="botstatus">DIJEDA</div><small id="lastupdate">Menunggu data pasar</small></div>
+  </section>
+
+  <div class="layout">
+    <section class="card">
+      <h2 class="section-title">Harga pasar & sinyal</h2>
+      <div class="coin"><div><strong>₿ Bitcoin (BTC/USDT)</strong><br><small id="btcprice">Memuat harga…</small></div><span class="pill" id="btcsignal">MENUNGGU</span></div>
+      <div class="coin"><div><strong>Ξ Ethereum (ETH/USDT)</strong><br><small id="ethprice">Memuat harga…</small></div><span class="pill" id="ethsignal">MENUNGGU</span></div>
+      <p class="muted" style="font-size:12px;margin:12px 0 0">Sinyal menggunakan EMA 9/21 dan RSI 14 pada candle 1 jam. Data dari Binance Public Market Data; ketersediaan dapat berbeda menurut wilayah/jaringan.</p>
+    </section>
+    <section class="card">
+      <h2 class="section-title">Pengaturan simulasi</h2>
+      <div class="controls">
+        <div class="field"><label>Modal awal (IDR)</label><input id="capital" type="number" min="10000" step="10000" value="100000"></div>
+        <div class="field"><label>Kurs USD/IDR (asumsi)</label><input id="fx" type="number" min="1000" value="16000"></div>
+        <div class="field"><label>Take profit (%)</label><input id="tp" type="number" min="0.2" max="20" step="0.1" value="2"></div>
+        <div class="field"><label>Stop loss (%)</label><input id="sl" type="number" min="0.2" max="20" step="0.1" value="1"></div>
+        <div class="field"><label>Risiko per transaksi (%)</label><input id="risk" type="number" min="0.1" max="2" step="0.1" value="1"></div>
+        <div class="field"><label>Biaya per sisi (%)</label><input id="fee" type="number" min="0" max="1" step="0.01" value="0.1"></div>
+      </div>
+      <div class="actions">
+        <button id="start">Mulai simulasi otomatis</button>
+        <button class="secondary" id="pause">Jeda</button>
+        <button class="danger" id="reset">Reset simulasi</button>
+      </div>
+      <small class="muted">Bot hanya membuka posisi long simulasi saat sinyal BUY. Maksimal satu posisi per aset.</small>
+    </section>
+  </div>
+
+  <section class="card wide">
+    <h2 class="section-title">Posisi terbuka</h2>
+    <div class="scroll"><table><thead><tr><th>Aset</th><th>Entry</th><th>Harga kini</th><th>Nilai</th><th>TP / SL</th><th>P/L</th></tr></thead><tbody id="positions"><tr><td colspan="6" class="muted">Belum ada posisi.</td></tr></tbody></table></div>
+  </section>
+  <section class="card wide">
+    <h2 class="section-title">Riwayat transaksi simulasi</h2>
+    <div class="scroll"><table><thead><tr><th>Waktu</th><th>Aset</th><th>Aksi</th><th>Harga</th><th>Hasil bersih</th><th>Alasan</th></tr></thead><tbody id="history"><tr><td colspan="6" class="muted">Belum ada transaksi.</td></tr></tbody></table></div>
+  </section>
+  <section class="card wide"><h2 class="section-title">Log sistem</h2><div class="log" id="logs"><div>BEN AI siap. Tekan “Mulai simulasi otomatis” untuk memulai.</div></div></section>
+  <footer>BEN AI Trading Bot · Versi 1.0 · Simulasi edukasi, bukan rekomendasi investasi. Harga dan kurs dapat terlambat/tidak tersedia. Simpanan simulasi berada di browser perangkat ini.</footer>
+</div>
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const fmtIDR = n => new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n);
+const fmtPrice = n => n == null ? '—' : '$'+Number(n).toLocaleString('en-US',{maximumFractionDigits:2});
+const state = {prices:{BTC:null,ETH:null}, signals:{BTC:'MENUNGGU',ETH:'MENUNGGU'}, candles:{}, positions:{}, history:[], initial:100000, cash:100000, running:false, timer:null, completed:0,wins:0};
+const log = msg => {const d=document.createElement('div');d.textContent=new Date().toLocaleTimeString('id-ID')+' · '+msg;$('logs').prepend(d);};
+const settings = () => ({fx:Math.max(1000,+$('fx').value||16000),tp:Math.max(.2,+$('tp').value||2)/100,sl:Math.max(.2,+$('sl').value||1)/100,risk:Math.min(2,Math.max(.1,+$('risk').value||1))/100,fee:Math.max(0,+$('fee').value||0)/100});
+async function fetchAsset(asset){
+ const symbol=asset+'USDT';
+ const url='https://api.binance.com/api/v3/klines?symbol='+symbol+'&interval=1h&limit=100';
+ const res=await fetch(url,{cache:'no-store'}); if(!res.ok) throw new Error('HTTP '+res.status);
+ const rows=await res.json(); if(!Array.isArray(rows)||rows.length<30) throw new Error('Data candle tidak cukup');
+ const closes=rows.slice(0,-1).map(r=>+r[4]);
+ const current=+rows[rows.length-1][4];
+ const ema=(arr,period)=>{const k=2/(period+1);let v=arr.slice(0,period).reduce((a,b)=>a+b,0)/period;for(let i=period;i<arr.length;i++)v=arr[i]*k+v*(1-k);return v;};
+ let gains=0,losses=0;for(let i=closes.length-14;i<closes.length;i++){const d=closes[i]-closes[i-1];if(d>0)gains+=d;else losses-=d;}
+ const rs=losses===0?100:gains/Math.max(losses,1e-12);const rsi=100-(100/(1+rs));
+ const e9=ema(closes,9),e21=ema(closes,21);
+ let signal='TUNGGU';
+ if(e9>e21 && rsi>=50 && rsi<=68) signal='BUY';
+ else if(e9<e21 && rsi<48) signal='BEARISH';
+ state.prices[asset]=current;state.signals[asset]=signal;
+ return {asset,current,rsi,e9,e21,signal};
+}
+function addHistory(asset,action,price,pnl,reason){state.history.unshift({time:new Date().toLocaleString('id-ID'),asset,action,price,pnl,reason});state.completed++;if(pnl>0)state.wins++;if(state.history.length>60)state.history.pop();}
+function openPosition(asset,price){
+ if(state.positions[asset])return;
+ const s=settings(),equity=state.cash+Object.values(state.positions).reduce((a,p)=>a+p.qty*p.entry,0)*s.fx;
+ const riskIDR=equity*s.risk, stopDistance=price*s.sl*s.fx;
+ const riskQty=riskIDR/stopDistance;
+ const budgetQty=(state.cash/s.fx)/(price*(1+s.fee));
+ const qty=Math.min(riskQty,budgetQty);
+ if(!Number.isFinite(qty)||qty*price<1)return;
+ const cost=qty*price*(1+s.fee)*s.fx;
+ if(cost>state.cash)return;
+ state.cash-=cost;
+ state.positions[asset]={entry:price,qty,cost,tp:price*(1+s.tp),sl:price*(1-s.sl)};
+ addHistory(asset,'BUY',price,0,'Sinyal EMA/RSI');log('Simulasi BUY '+asset+' pada '+fmtPrice(price));
+}
+function closePosition(asset,price,reason){
+ const p=state.positions[asset];if(!p)return;
+ const s=settings(),proceeds=p.qty*price*(1-s.fee)*s.fx,pnl=proceeds-p.cost;
+ state.cash+=proceeds;delete state.positions[asset];addHistory(asset,'SELL',price,pnl,reason);
+ log('Simulasi SELL '+asset+' · '+reason+' · '+fmtIDR(pnl));
+}
+function render(){
+ const s=settings(), open=Object.entries(state.positions);
+ const value=open.reduce((a,[asset,p])=>a+p.qty*(state.prices[asset]||p.entry)*s.fx,0);
+ const equity=state.cash+value,pnl=equity-state.initial;
+ $('equity').textContent=fmtIDR(state.initial);$('cash').textContent='Kas tersedia: '+fmtIDR(state.cash);
+ $('portfolio').textContent=fmtIDR(equity);$('pnl').textContent='P/L: '+fmtIDR(pnl)+' ('+(pnl/state.initial*100).toFixed(2)+'%)';$('pnl').className=pnl>=0?'up':'down';
+ $('trades').textContent=state.completed;$('winrate').textContent='Win rate: '+(state.completed?(state.wins/state.completed*100).toFixed(1)+'%':'—');
+ $('botstatus').textContent=state.running?'BERJALAN':'DIJEDA';$('lastupdate').textContent='Pembaruan: '+new Date().toLocaleTimeString('id-ID');
+ for(const a of ['BTC','ETH']){$(a.toLowerCase()+'price').textContent=state.prices[a]?fmtPrice(state.prices[a]):'Memuat harga…';$(a.toLowerCase()+'signal').textContent=state.signals[a];}
+ $('positions').innerHTML=open.length?open.map(([a,p])=>{const now=state.prices[a]||p.entry;const v=p.qty*now*s.fx;return `<tr><td>${a}</td><td>${fmtPrice(p.entry)}</td><td>${fmtPrice(now)}</td><td>${fmtIDR(v)}</td><td>${fmtPrice(p.tp)} / ${fmtPrice(p.sl)}</td><td class="${now>=p.entry?'up':'down'}">${fmtIDR((now-p.entry)*p.qty*s.fx)}</td></tr>`}).join(''):'<tr><td colspan="6" class="muted">Belum ada posisi.</td></tr>';
+ $('history').innerHTML=state.history.length?state.history.map(h=>`<tr><td>${h.time}</td><td>${h.asset}</td><td>${h.action}</td><td>${fmtPrice(h.price)}</td><td class="${h.pnl>=0?'up':'down'}">${h.action==='SELL'?fmtIDR(h.pnl):'—'}</td><td>${h.reason}</td></tr>`).join(''):'<tr><td colspan="6" class="muted">Belum ada transaksi.</td></tr>';
+}
+async function cycle(){
+ try{
+  const results=await Promise.all(['BTC','ETH'].map(fetchAsset));
+  for(const r of results){
+   const p=state.positions[r.asset];
+   if(p){if(r.current>=p.tp)closePosition(r.asset,r.current,'Take profit');else if(r.current<=p.sl)closePosition(r.asset,r.current,'Stop loss');}
+   else if(state.running&&r.signal==='BUY')openPosition(r.asset,r.current);
+  }
+  render();
+ }catch(e){log('Data pasar gagal diperbarui: '+e.message+'. Akan mencoba lagi.');}
+}
+function start(){if(state.running)return;state.running=true;log('Simulasi otomatis dimulai.');cycle();state.timer=setInterval(cycle,60000);render();}
+function pause(){state.running=false;clearInterval(state.timer);state.timer=null;log('Bot dijeda. Posisi simulasi tetap terbuka dan tidak dipantau saat jeda.');render();}
+$('start').addEventListener('click',start);$('pause').addEventListener('click',pause);
+$('reset').addEventListener('click',()=>{if(!confirm('Hapus seluruh riwayat dan reset modal simulasi?'))return;pause();state.initial=Math.max(10000,+$('capital').value||100000);state.cash=state.initial;state.positions={};state.history=[];state.completed=0;state.wins=0;log('Simulasi direset.');render();});
+$('capital').addEventListener('change',()=>{if(state.completed===0&&Object.keys(state.positions).length===0){state.initial=Math.max(10000,+$('capital').value||100000);state.cash=state.initial;render();}});
+state.initial=100000;state.cash=100000;render();cycle();
+})();
+</script>
+</body>
+</html>

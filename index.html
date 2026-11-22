@@ -1,23 +1,75 @@
 <!doctype html>
-<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#071b31"><title>BEN AI Trading Robot</title><style>
-:root{color-scheme:dark;--bg:#071321;--panel:#10243a;--line:#203b56;--muted:#9bb0c5;--blue:#39a9ff;--green:#2bd49a;--red:#ff6b78;--amber:#ffc45c}*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#071321,#0a1e32 65%,#102d43);color:#edf6ff;font:15px system-ui,Arial}header{padding:22px max(18px,calc((100% - 1100px)/2));border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.brand{font-size:24px;font-weight:850;letter-spacing:1px}.brand span{color:var(--blue)}.sub,.muted{color:var(--muted);font-size:12px}.wrap{max-width:1100px;margin:auto;padding:20px 16px 40px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}.pill{border:1px solid var(--line);border-radius:99px;padding:7px 11px;color:var(--green);font-size:12px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.card{background:linear-gradient(145deg,#112943,#0d2034);border:1px solid var(--line);border-radius:16px;padding:17px;min-width:0}.asset{display:flex;justify-content:space-between;align-items:center}.coin{font-weight:750;font-size:17px}.price{font-size:27px;font-weight:800;margin:12px 0 4px}.change{font-size:13px}.signal{display:inline-block;padding:7px 12px;border-radius:9px;font-weight:800;letter-spacing:.4px;background:#24394d}.BUY{color:var(--green);background:#123d39}.SELL{color:var(--red);background:#46232e}.HOLD{color:var(--amber);background:#46391f}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:15px}.metric{background:#091b2c;border-radius:10px;padding:9px}.metric small{display:block;color:var(--muted);font-size:11px}.metric b{display:block;margin-top:4px;font-size:14px}.wide{grid-column:1/-1}.chart{height:210px;width:100%;display:block;margin-top:12px}.actions{display:flex;gap:8px;flex-wrap:wrap}button{border:1px solid var(--line);background:#153b5c;color:white;border-radius:10px;padding:10px 14px;font-weight:650}button:active{transform:scale(.98)}.note{font-size:12px;line-height:1.6;color:var(--muted)}.status{font-size:12px;color:var(--muted)}footer{padding:20px 0;color:var(--muted);font-size:12px;text-align:center}@media(max-width:650px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}.price{font-size:24px}.metrics{gap:6px}.metric{padding:8px}.metric b{font-size:12px}}
-</style></head><body>
-<header><div><div class="brand">BEN <span>AI</span></div><div class="sub">TRADING ROBOT · MARKET MONITOR</div></div><div class="pill">● MONITORING MODE · READ ONLY</div></header>
-<main class="wrap"><div class="top"><div><h2 style="margin:0 0 4px">Dashboard pasar crypto</h2><div class="status" id="updated">Menghubungkan ke data pasar...</div></div><div class="actions"><button id="refresh">↻ Perbarui data</button></div></div>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#071b31"><title>BEN AI — Indodax Paper Trading</title>
+<style>
+:root{color-scheme:dark;--bg:#071321;--panel:#10243a;--line:#203b56;--muted:#9bb0c5;--blue:#39a9ff;--green:#2bd49a;--red:#ff6b78;--amber:#ffc45c}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#071321,#0a1e32 65%,#102d43);color:#edf6ff;font:15px system-ui,Arial}
+header{padding:20px max(18px,calc((100% - 1050px)/2));border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font-size:23px;font-weight:850}.brand span{color:var(--blue)}.muted,.note{color:var(--muted)}.muted{font-size:12px}
+.wrap{max-width:1050px;margin:auto;padding:20px 16px 42px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.pill{border:1px solid var(--line);border-radius:99px;padding:7px 11px;color:var(--green);font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-top:16px}
+.card{background:linear-gradient(145deg,#112943,#0d2034);border:1px solid var(--line);border-radius:15px;padding:16px;min-width:0}
+.wide{grid-column:1/-1}.price{font-size:25px;font-weight:800;margin:10px 0}.signal{display:inline-block;padding:6px 10px;border-radius:8px;font-weight:800;background:#24394d}.BUY{color:var(--green);background:#123d39}.SELL{color:var(--red);background:#46232e}.HOLD{color:var(--amber);background:#46391f}
+.row{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid #20364b;font-size:13px}.row:last-child{border:0}
+button{border:1px solid var(--line);background:#153b5c;color:white;border-radius:9px;padding:10px 13px;font-weight:650}button:disabled{opacity:.45}
+.actions{display:flex;gap:8px;flex-wrap:wrap}input{width:100%;padding:11px;background:#081a2a;color:white;border:1px solid var(--line);border-radius:9px}
+.note{font-size:12px;line-height:1.55}.big{font-size:26px;font-weight:800}.green{color:var(--green)}.red{color:var(--red)}.amber{color:var(--amber)}
+table{width:100%;border-collapse:collapse;font-size:12px}td,th{text-align:left;padding:9px 6px;border-bottom:1px solid var(--line)}footer{text-align:center;color:var(--muted);font-size:11px;padding:24px 0}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}.price{font-size:23px}}
+</style></head>
+<body>
+<header><div><div class="brand">BEN <span>AI</span></div><div class="muted">INDODAX CONNECTOR · PAPER TRADING</div></div><div class="pill">● UJI SAJA · ORDER NYATA NONAKTIF</div></header>
+<main class="wrap">
+<div class="top"><div><h2 style="margin:0 0 4px">Robot simulasi BTC & ETH</h2><div class="muted" id="updated">Menghubungkan ke Worker Cloudflare…</div></div><div class="actions"><button id="refresh">↻ Perbarui harga</button><button id="pause">Jeda simulasi</button></div></div>
 <div class="grid">
-<section class="card"><div class="asset"><div class="coin">₿ Bitcoin <span class="muted">BTC/IDR</span></div><span class="signal HOLD" id="sig-btc">MEMUAT</span></div><div class="price" id="price-btc">—</div><div class="change" id="change-btc">Perubahan 24 jam: —</div><canvas class="chart" id="chart-btc"></canvas><div class="metrics"><div class="metric"><small>RSI 14</small><b id="rsi-btc">—</b></div><div class="metric"><small>EMA 9</small><b id="ema9-btc">—</b></div><div class="metric"><small>EMA 21</small><b id="ema21-btc">—</b></div></div><p class="note" id="why-btc">Menunggu data indikator.</p></section>
-<section class="card"><div class="asset"><div class="coin">◆ Ethereum <span class="muted">ETH/IDR</span></div><span class="signal HOLD" id="sig-eth">MEMUAT</span></div><div class="price" id="price-eth">—</div><div class="change" id="change-eth">Perubahan 24 jam: —</div><canvas class="chart" id="chart-eth"></canvas><div class="metrics"><div class="metric"><small>RSI 14</small><b id="rsi-eth">—</b></div><div class="metric"><small>EMA 9</small><b id="ema9-eth">—</b></div><div class="metric"><small>EMA 21</small><b id="ema21-eth">—</b></div></div><p class="note" id="why-eth">Menunggu data indikator.</p></section>
-<section class="card wide"><h3 style="margin:0 0 10px">Cara membaca sinyal BEN AI</h3><div class="grid"><div><span class="signal BUY">BUY</span><p class="note">Tren EMA 9 di atas EMA 21 dan RSI menunjukkan momentum yang mendukung. Ini sinyal analisis, bukan perintah transaksi.</p></div><div><span class="signal SELL">SELL</span><p class="note">Tren melemah atau momentum turun. Evaluasi posisi dan risiko; robot tidak menjual aset Anda.</p></div><div><span class="signal HOLD">HOLD</span><p class="note">Indikator belum searah atau belum cukup kuat. Menunggu konfirmasi lebih baik daripada memaksakan transaksi.</p></div></div></section>
-<section class="card wide"><h3 style="margin:0 0 8px">Pengaturan & keamanan</h3><p class="note">Data harga diambil dari API publik CoinGecko dalam IDR. Indikator dihitung dari data historis 7 hari (interval per jam). Pembaruan otomatis setiap 60 detik. Aplikasi ini hanya memantau dan menghasilkan sinyal; tidak terhubung ke API broker/exchange untuk order, tidak menyimpan password, seed phrase, atau private key, dan tidak menjamin keuntungan.</p><p class="note">Gunakan keputusan sendiri dan uji sinyal terlebih dahulu. Pasar crypto berisiko tinggi; sinyal dapat terlambat atau keliru.</p><div class="status" id="error" role="status"></div></section>
-</div><footer>BEN AI Trading Robot · Versi 1.0 · Gratis · Monitoring saja</footer></main>
+<section class="card"><div class="muted">SALDO SIMULASI</div><div class="big" id="equity">Rp50.000</div><div class="row"><span>P/L terealisasi</span><b id="realized">Rp0</b></div><div class="row"><span>P/L berjalan</span><b id="unrealized">Rp0</b></div><div class="row"><span>Rugi harian tersisa</span><b id="riskleft">Rp1.250</b></div><div class="row"><span>Entry hari ini</span><b id="entries">0 / 1</b></div></section>
+<section class="card"><div class="muted">ATURAN RISIKO TETAP</div><div class="row"><span>Modal simulasi</span><b>Rp50.000</b></div><div class="row"><span>Alokasi posisi maksimum</span><b>Rp25.000</b></div><div class="row"><span>Take profit</span><b class="green">+2%</b></div><div class="row"><span>Stop loss</span><b class="red">−1%</b></div><div class="row"><span>Batas rugi harian</span><b>Rp1.250 (2,5%)</b></div><div class="row"><span>Posisi bersamaan</span><b>1</b></div></section>
+<section class="card"><div class="muted">BITCOIN · BTC/IDR</div><div class="price" id="btcprice">—</div><div class="row"><span>Sinyal indikator</span><b id="btcsignal">MENUNGGU</b></div><div class="row"><span>Posisi simulasi</span><b id="btcposition">Kosong</b></div></section>
+<section class="card"><div class="muted">ETHEREUM · ETH/IDR</div><div class="price" id="ethprice">—</div><div class="row"><span>Sinyal indikator</span><b id="ethsignal">MENUNGGU</b></div><div class="row"><span>Posisi simulasi</span><b id="ethposition">Kosong</b></div></section>
+<section class="card wide"><h3 style="margin:0 0 8px">Kontrol paper trading</h3><p class="note">Mesin simulasi hanya membuka posisi virtual saat sinyal BUY. TP/SL diperiksa dari harga publik setiap pembaruan. Tidak ada order ke Indodax. Harga dapat terlambat; biaya dan slippage belum dimodelkan sehingga hasil simulasi dapat lebih baik dari hasil nyata.</p><div class="actions"><button id="start">Mulai / lanjutkan</button><button id="reset">Reset simulasi</button></div><p class="note" id="status">Status: dijeda. Tidak ada transaksi nyata.</p></section>
+<section class="card wide"><h3 style="margin:0 0 8px">Riwayat transaksi virtual</h3><div style="overflow:auto"><table><thead><tr><th>Waktu</th><th>Pasangan</th><th>Aksi</th><th>Harga</th><th>P/L</th><th>Alasan</th></tr></thead><tbody id="history"><tr><td colspan="6">Belum ada transaksi simulasi.</td></tr></tbody></table></div></section>
+<section class="card wide"><h3 style="margin:0 0 8px">Koneksi backend</h3><div class="row"><span>Cloudflare Worker</span><b id="workerstatus">Memeriksa…</b></div><div class="row"><span>Data harga Indodax publik</span><b id="marketstatus">Menunggu…</b></div><div class="row"><span>Order sungguhan</span><b class="red">DINONAKTIFKAN</b></div><p class="note">API Key dan Secret tidak diminta oleh dashboard ini. Jangan memasukkan kredensial rahasia ke browser atau GitHub. Koneksi akun privat hanya boleh dilakukan lewat encrypted secrets Cloudflare dan setelah diuji terpisah.</p></section>
+</div><footer>BEN AI · Paper Trading · Rp50.000 · BTCIDR + ETHIDR · No live orders</footer>
+</main>
 <script>
+const API='https://ben-ai-indodax.jesimalango.workers.dev';
+const START=50000, ALLOC=25000, TP=.02, SL=.01, DAILY=1250;
 const fmt=n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n);
-const short=n=>new Intl.NumberFormat('id-ID',{notation:'compact',maximumFractionDigits:2}).format(n);
-function ema(a,p){let k=2/(p+1),v=a[0];for(let i=1;i<a.length;i++)v=a[i]*k+v*(1-k);return v}
-function rsi(a,p=14){if(a.length<=p)return 50;let g=0,l=0;for(let i=a.length-p;i<a.length;i++){let d=a[i]-a[i-1];if(d>0)g+=d;else l-=d}if(l===0)return 100;return 100-100/(1+g/l)}
-function signal(e9,e21,r){if(e9>e21&&r>=52&&r<72)return ['BUY','EMA 9 di atas EMA 21; RSI mendukung momentum naik.'];if(e9<e21&&r<=48)return ['SELL','EMA 9 di bawah EMA 21; momentum sedang melemah.'];return ['HOLD','Arah EMA dan RSI belum memberikan konfirmasi yang cukup.']}
-function draw(id,arr){const c=document.getElementById(id),dpr=window.devicePixelRatio||1,w=c.clientWidth,h=210;c.width=w*dpr;c.height=h*dpr;const x=c.getContext('2d');x.scale(dpr,dpr);if(!arr.length)return;let lo=Math.min(...arr),hi=Math.max(...arr),pad=12;x.strokeStyle='#39a9ff';x.lineWidth=2;x.beginPath();arr.forEach((v,i)=>{let px=pad+i/(arr.length-1)*(w-pad*2),py=h-pad-(v-lo)/(hi-lo||1)*(h-pad*2);i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke();x.fillStyle='#9bb0c5';x.font='11px system-ui';x.fillText('7 hari · interval 1 jam',pad,14)}
-async function loadCoin(id,sym){const url='https://api.coingecko.com/api/v3/coins/'+id+'/market_chart?vs_currency=idr&days=7&interval=hourly';const res=await fetch(url);if(!res.ok)throw new Error('API '+res.status+' untuk '+sym);const j=await res.json();const prices=(j.prices||[]).map(p=>p[1]);if(prices.length<22)throw new Error('Data historis '+sym+' belum cukup');const now=prices.at(-1),prev=prices[Math.max(0,prices.length-25)],e9=ema(prices.slice(-60),9),e21=ema(prices.slice(-60),21),r=rsi(prices),[s,why]=signal(e9,e21,r);document.getElementById('price-'+sym).textContent=fmt(now);let ch=(now/prev-1)*100;let ce=document.getElementById('change-'+sym);ce.textContent='Perubahan sekitar 24 jam: '+(ch>=0?'+':'')+ch.toFixed(2)+'%';ce.style.color=ch>=0?'#2bd49a':'#ff6b78';let se=document.getElementById('sig-'+sym);se.textContent=s;se.className='signal '+s;document.getElementById('rsi-'+sym).textContent=r.toFixed(1);document.getElementById('ema9-'+sym).textContent=short(e9);document.getElementById('ema21-'+sym).textContent=short(e21);document.getElementById('why-'+sym).textContent=why;draw('chart-'+sym,prices.slice(-120))}
-let busy=false;async function refresh(){if(busy)return;busy=true;document.getElementById('error').textContent='';document.getElementById('updated').textContent='Memperbarui data pasar...';try{const results=await Promise.allSettled([loadCoin('bitcoin','btc'),loadCoin('ethereum','eth')]);let errs=results.filter(x=>x.status==='rejected').map(x=>x.reason.message);if(errs.length)throw new Error(errs.join(' · '));document.getElementById('updated').textContent='Data diperbarui: '+new Date().toLocaleString('id-ID')+' · Refresh 60 detik'}catch(e){document.getElementById('error').textContent='Gagal memuat data: '+e.message+'. Tekan Perbarui data atau coba lagi nanti.';document.getElementById('updated').textContent='Data belum lengkap'}finally{busy=false}}
-document.getElementById('refresh').addEventListener('click',refresh);refresh();setInterval(refresh,60000);
+const state={prices:{},positions:{},history:[],realized:0,entries:0,day:new Date().toLocaleDateString('en-CA'),running:false};
+const $=id=>document.getElementById(id);
+function signal(){return 'HOLD';} // Live indicator engine intentionally not allowed to trigger real orders.
+function addHistory(pair,action,price,pnl,reason){state.history.unshift({time:new Date().toLocaleTimeString('id-ID'),pair,action,price,pnl,reason});state.history=state.history.slice(0,30)}
+function closePosition(pair,price,reason){const p=state.positions[pair];if(!p)return;const pnl=ALLOC*(price/p.entry-1);state.realized+=pnl;addHistory(pair,'JUAL VIRTUAL',price,pnl,reason);delete state.positions[pair]}
+function updatePaper(){
+ const today=new Date().toLocaleDateString('en-CA');if(today!==state.day){state.day=today;state.entries=0;state.realized=0}
+ for(const pair of ['BTCIDR','ETHIDR']){const price=state.prices[pair],p=state.positions[pair];if(!price||!p)continue;const move=price/p.entry-1;if(move>=TP)closePosition(pair,price,'Take profit +2%');else if(move<=-SL)closePosition(pair,price,'Stop loss -1%')}
+ render();
+}
+function render(){
+ const pos=Object.entries(state.positions);let unreal=pos.reduce((s,[k,p])=>s+ALLOC*(state.prices[k]/p.entry-1),0);
+ $('equity').textContent=fmt(START+state.realized+unreal);$('realized').textContent=fmt(state.realized);$('unrealized').textContent=fmt(unreal);$('riskleft').textContent=fmt(Math.max(0,DAILY+Math.min(0,state.realized)));$('entries').textContent=state.entries+' / 1';
+ for(const [pair,id] of [['BTCIDR','btc'],['ETHIDR','eth']]){$(id+'price').textContent=state.prices[pair]?fmt(state.prices[pair]):'—';$(id+'signal').textContent='HOLD · monitor';$(id+'position').textContent=state.positions[pair]?'Beli virtual '+fmt(ALLOC)+' · '+fmt(state.positions[pair].entry):'Kosong'}
+ $('history').innerHTML=state.history.length?state.history.map(x=>'<tr><td>'+x.time+'</td><td>'+x.pair+'</td><td>'+x.action+'</td><td>'+fmt(x.price)+'</td><td>'+fmt(x.pnl)+'</td><td>'+x.reason+'</td></tr>').join(''):'<tr><td colspan="6">Belum ada transaksi simulasi.</td></tr>';
+}
+async function refresh(){
+ $('updated').textContent='Mengambil harga dari Indodax…';
+ try{
+  const [h,m]=await Promise.all([fetch(API+'/health'),fetch(API+'/api/market')]);
+  const health=await h.json(),market=await m.json();
+  $('workerstatus').textContent=health.ok?'ONLINE · '+health.mode:'GAGAL';
+  if(!market.ok||!market.prices)throw new Error('API market tidak mengembalikan harga');
+  state.prices=market.prices;
+  $('marketstatus').textContent='ONLINE · Indodax public API';
+  $('updated').textContent='Harga diperbarui '+new Date().toLocaleString('id-ID');
+  if(state.running)updatePaper();else render();
+ }catch(e){$('marketstatus').textContent='GAGAL';$('updated').textContent='Gagal mengambil harga: '+e.message}
+}
+$('refresh').onclick=refresh;
+$('start').onclick=()=>{state.running=true;$('status').textContent='Status: simulasi berjalan. Tidak mengirim order sungguhan.';refresh()};
+$('pause').onclick=()=>{state.running=false;$('status').textContent='Status: dijeda.'};
+$('reset').onclick=()=>{state.positions={};state.history=[];state.realized=0;state.entries=0;state.running=false;$('status').textContent='Status: simulasi direset dan dijeda.';render()};
+refresh();setInterval(refresh,60000);
 </script></body></html>
